@@ -20,13 +20,13 @@ main =
 
 
 type alias Model =
-    { dieFace : Int
+    { dieFaces : ( Int, Int )
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 1, Cmd.none )
+    ( Model ( 1, 1 ), Cmd.none )
 
 
 
@@ -35,14 +35,14 @@ init =
 
 type Msg
     = Roll
-    | NewFace Int
+    | NewFace ( Int, Int )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
-            ( model, Random.generate NewFace (Random.int 1 6) )
+            ( model, Random.generate NewFace (Random.pair (Random.int 1 6) (Random.int 1 6)) )
 
         NewFace newFace ->
             ( Model newFace, Cmd.none )
@@ -63,8 +63,13 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+    let
+        ( dieFace1, dieFace2 ) =
+            model.dieFaces
+    in
     div [ wrapperStyles ]
-        [ img [ src ("../static/die-" ++ toString model.dieFace ++ ".png") ] []
+        [ img [ src ("../static/die-" ++ toString dieFace1 ++ ".png") ] []
+        , img [ src ("../static/die-" ++ toString dieFace2 ++ ".png") ] []
         , button [ buttonStyles, onClick Roll ] [ text "Roll" ]
         ]
 
