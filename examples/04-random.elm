@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Random
 
@@ -62,7 +63,32 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text (toString model.dieFace) ]
-        , button [ onClick Roll ] [ text "Roll" ]
+    div [ wrapperStyles ]
+        [ img [ src ("../static/die-" ++ toString model.dieFace ++ ".png") ] []
+        , button [ buttonStyles, onClick Roll ] [ text "Roll" ]
+        ]
+
+
+wrapperStyles =
+    style
+        [ ( "background", "#0e0e0e" )
+        , ( "width", "100vw" )
+        , ( "height", "100vh" )
+        , ( "text-align", "center" )
+        , ( "padding", "15%" )
+        , ( "box-sizing", "border-box" )
+        , ( "font", "1em/.8em cursive, sans-serif" )
+        ]
+
+
+buttonStyles =
+    style
+        [ ( "width", "128px" )
+        , ( "display", "block" )
+        , ( "padding", "15px 30px" )
+        , ( "margin", "30px auto" )
+        , ( "background", "darkgray" )
+        , ( "font", "inherit" )
+        , ( "border-radius", "3px" )
+        , ( "border", "1px solid white" )
         ]
