@@ -23,12 +23,17 @@ main =
 type alias Model =
     { topic : String
     , gifUrl : String
+    , error : String
     }
 
 
 init : String -> ( Model, Cmd Msg )
 init topic =
-    ( Model topic "waiting.gif"
+    let
+        loadingGif =
+            "http://moziru.com/images/drawn-hamster-hamster-wheel-7.gif"
+    in
+    ( Model topic loadingGif ""
     , getRandomGif topic
     )
 
@@ -49,10 +54,14 @@ update msg model =
             ( model, getRandomGif model.topic )
 
         NewGif (Ok newUrl) ->
-            ( Model model.topic newUrl, Cmd.none )
+            ( Model model.topic newUrl "", Cmd.none )
 
-        NewGif (Err _) ->
-            ( model, Cmd.none )
+        NewGif (Err error) ->
+            let
+                errorGif =
+                    "http://pa1.narvii.com/6508/c2dfff227b76d11810cf2aff2e5487ac17b05a3b_00.gif"
+            in
+            ( { model | gifUrl = errorGif, error = toString error }, Cmd.none )
 
 
 
@@ -65,8 +74,37 @@ view model =
         [ h2 [] [ text model.topic ]
         , button [ onClick MorePlease ] [ text "More Please!" ]
         , br [] []
+        , errorBlock model
         , img [ src model.gifUrl ] []
         ]
+
+
+errorBlock model =
+    if String.isEmpty model.error then
+        text ""
+    else
+        div []
+            [ h3 [] [ text "Aw, crap--an error!" ]
+            , p [] [ text model.error ]
+            ]
+
+
+errorMessage error =
+    case error of
+        Http.BadUrl error ->
+            "The image URL is bogus, man"
+
+        Http.Timeout ->
+            "The internets are wasting our time - we gave up"
+
+        Http.NetworkError ->
+            "The network is very grumpy"
+
+        Http.BadStatus response ->
+            "The image status is effed"
+
+        Http.BadPayload error response ->
+            "We asked for an image and got something else, wtf"
 
 
 
