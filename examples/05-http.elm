@@ -27,12 +27,16 @@ type alias Model =
     }
 
 
+loadingGif =
+    "http://moziru.com/images/drawn-hamster-hamster-wheel-7.gif"
+
+
+errorGif =
+    "http://pa1.narvii.com/6508/c2dfff227b76d11810cf2aff2e5487ac17b05a3b_00.gif"
+
+
 init : String -> ( Model, Cmd Msg )
 init topic =
-    let
-        loadingGif =
-            "http://moziru.com/images/drawn-hamster-hamster-wheel-7.gif"
-    in
     ( Model topic loadingGif ""
     , getRandomGif topic
     )
@@ -45,22 +49,22 @@ init topic =
 type Msg
     = MorePlease
     | NewGif (Result Http.Error String)
+    | TopicChange String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         MorePlease ->
-            ( model, getRandomGif model.topic )
+            ( { model | gifUrl = loadingGif }, getRandomGif model.topic )
+
+        TopicChange topic ->
+            init topic
 
         NewGif (Ok newUrl) ->
             ( Model model.topic newUrl "", Cmd.none )
 
         NewGif (Err error) ->
-            let
-                errorGif =
-                    "http://pa1.narvii.com/6508/c2dfff227b76d11810cf2aff2e5487ac17b05a3b_00.gif"
-            in
             ( { model | gifUrl = errorGif, error = toString error }, Cmd.none )
 
 
@@ -71,8 +75,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h2 [] [ text model.topic ]
-        , button [ onClick MorePlease ] [ text "More Please!" ]
+        [ label [] [ text "Topic" ]
+        , input [ onInput TopicChange, placeholder "cats" ] []
+        , button [ onClick MorePlease ] [ text "Find Gif!" ]
         , br [] []
         , errorBlock model
         , img [ src model.gifUrl ] []
