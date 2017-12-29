@@ -25,6 +25,7 @@ type alias Model =
     , gifUrl : String
     , error : Maybe Http.Error
     , selectOptions : List String
+    , isLoading : Bool
     }
 
 
@@ -52,7 +53,7 @@ selectOptions =
 
 init : String -> ( Model, Cmd Msg )
 init topic =
-    ( Model topic loadingGif Nothing selectOptions
+    ( Model topic "" Nothing selectOptions True
     , getRandomGif topic
     )
 
@@ -71,16 +72,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         MorePlease ->
-            ( { model | gifUrl = loadingGif }, getRandomGif model.topic )
+            ( { model | isLoading = True }, getRandomGif model.topic )
 
         TopicChange topic ->
             init topic
 
         NewGif (Ok newUrl) ->
-            ( { model | gifUrl = newUrl, error = Nothing }, Cmd.none )
+            ( { model | gifUrl = newUrl, isLoading = False, error = Nothing }, Cmd.none )
 
         NewGif (Err error) ->
-            ( { model | gifUrl = errorGif, error = Just error }, Cmd.none )
+            ( { model | error = Just error, isLoading = False }, Cmd.none )
 
 
 
@@ -109,8 +110,23 @@ view model =
             [ text "Find Gif!" ]
         , br [] []
         , errorBlock model
-        , img [ style styles.img, src model.gifUrl ] []
+        , viewImage model.gifUrl <| not model.isLoading && not (hasErrors model)
+        , viewImage loadingGif model.isLoading
+        , viewImage errorGif <| hasErrors model
         ]
+
+
+viewImage imageUrl isDisplayed =
+    if String.isEmpty imageUrl then
+        text ""
+    else if isDisplayed then
+        div []
+            [ img [ style styles.img, src imageUrl ] []
+            ]
+    else
+        div [ style [ ( "display", "none" ) ] ]
+            [ img [ style styles.img, src imageUrl ] []
+            ]
 
 
 selectOption value =
@@ -159,8 +175,7 @@ styles =
         , ( "color", "coral" )
         ]
     , img =
-        [ ( "border", "3px solid white" )
-        , ( "margin", "30px" )
+        [ ( "margin", "30px" )
         ]
     , inputs =
         [ ( "display", "block" )
@@ -187,6 +202,10 @@ styles =
         , ( "margin", "2.5em" )
         ]
     }
+
+
+hasErrors model =
+    not (model.error == Nothing)
 
 
 
