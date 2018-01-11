@@ -74,6 +74,39 @@ map f tree =
             Node (f v) (map f left) (map f right)
 
 
+sum : Tree number -> number
+sum tree =
+    case tree of
+        Empty ->
+            0
+
+        Node v left right ->
+            v + sum left + sum right
+
+
+flatten : Tree a -> List a
+flatten tree =
+    case tree of
+        Empty ->
+            []
+
+        Node v left right ->
+            List.concat [ v :: flatten left, flatten right ]
+
+
+isElement : a -> Tree a -> Bool
+isElement a tree =
+    case tree of
+        Empty ->
+            False
+
+        Node v left right ->
+            if a == v then
+                True
+            else
+                isElement a left || isElement a right
+
+
 
 -- PLAYGROUND
 
@@ -86,11 +119,18 @@ niceTree =
     fromList [ 2, 1, 3 ]
 
 
+oakTree =
+    Node 3 (Node 2 (Node 3 Empty (Node 11 Empty Empty)) Empty) (Node 4 Empty Empty)
+
+
 main =
     div [ style [ ( "font-family", "monospace" ) ] ]
         [ display "depth deepTree" (depth deepTree)
         , display "depth niceTree" (depth niceTree)
         , display "incremented" (map (\n -> n + 1) niceTree)
+        , display "sum" <| sum oakTree
+        , display "flatten" <| flatten oakTree
+        , display "isElement" <| isElement 111 oakTree
         ]
 
 
