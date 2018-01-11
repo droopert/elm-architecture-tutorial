@@ -74,6 +74,20 @@ map f tree =
             Node (f v) (map f left) (map f right)
 
 
+fold : (a -> b -> b) -> b -> Tree a -> b
+fold fn accumulator tree =
+    case tree of
+        Empty ->
+            accumulator
+
+        Node value left right ->
+            -- I couldn't get this right, so credit where it is due:
+            -- An Introduction to Elm Series: Solution to ‘Binary Tree’ example
+            -- by George Michael
+            -- https://bytefreaks.net/programming-2/elm/an-introduction-to-elm-series-solution-to-binary-tree-example
+            fn value <| fold fn (fold fn accumulator left) right
+
+
 sum : Tree number -> number
 sum tree =
     case tree of
