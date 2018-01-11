@@ -98,6 +98,11 @@ sum tree =
             v + sum left + sum right
 
 
+foldSum : Tree number -> number
+foldSum =
+    fold (+) 0
+
+
 flatten : Tree a -> List a
 flatten tree =
     case tree of
@@ -106,6 +111,11 @@ flatten tree =
 
         Node v left right ->
             List.concat [ v :: flatten left, flatten right ]
+
+
+foldFlatten : Tree a -> List a
+foldFlatten =
+    fold (::) []
 
 
 isElement : a -> Tree a -> Bool
@@ -119,6 +129,14 @@ isElement a tree =
                 True
             else
                 isElement a left || isElement a right
+
+
+foldIsElement : a -> Tree a -> Bool
+foldIsElement x =
+    -- My implementation:
+    -- fold (\c a -> a || c == x) False
+    -- More concise implementation from same article noted in `fold`
+    fold ((==) x >> (||)) False
 
 
 
@@ -143,8 +161,11 @@ main =
         , display "depth niceTree" <| depth niceTree
         , display "incremented" <| map ((+) 1) niceTree
         , display "sum" <| sum oakTree
+        , display "foldSum" <| foldSum oakTree
         , display "flatten" <| flatten oakTree
+        , display "foldFlatten" <| foldFlatten oakTree
         , display "isElement" <| isElement 111 oakTree
+        , display "foldIsElement" <| foldIsElement 111 oakTree
         ]
 
 
