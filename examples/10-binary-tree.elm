@@ -125,9 +125,9 @@ oakTree =
 
 main =
     div [ style [ ( "font-family", "monospace" ) ] ]
-        [ display "depth deepTree" (depth deepTree)
-        , display "depth niceTree" (depth niceTree)
-        , display "incremented" (map (\n -> n + 1) niceTree)
+        [ display "depth deepTree" <| depth deepTree
+        , display "depth niceTree" <| depth niceTree
+        , display "incremented" <| map ((+) 1) niceTree
         , display "sum" <| sum oakTree
         , display "flatten" <| flatten oakTree
         , display "isElement" <| isElement 111 oakTree
