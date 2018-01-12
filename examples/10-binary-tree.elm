@@ -12,7 +12,7 @@
 
 module Main exposing (..)
 
-import Html exposing (Html, div, text)
+import Html exposing (Html, div, h1, h2, h3, p, text)
 import Html.Attributes exposing (style)
 
 
@@ -157,21 +157,54 @@ oakTree =
 
 main =
     div [ style [ ( "font-family", "monospace" ) ] ]
-        [ display "depth deepTree" <| depth deepTree
-        , display "depth niceTree" <| depth niceTree
-        , display "incremented" <| map ((+) 1) niceTree
-        , display "sum" <| sum oakTree
-        , display "foldSum" <| foldSum oakTree
-        , display "flatten" <| flatten oakTree
-        , display "foldFlatten" <| foldFlatten oakTree
-        , display "isElement" <| isElement 111 oakTree
-        , display "foldIsElement" <| foldIsElement 111 oakTree
+        [ h1 [] [ text "Binary Tree Example" ]
+        , display "depth" deepTree Nothing <| depth deepTree
+        , display "depth" niceTree Nothing <| depth niceTree
+        , display "incremented" niceTree Nothing <| map ((+) 1) niceTree
+        , display "sum" oakTree Nothing <| sum oakTree
+        , display "foldSum" oakTree Nothing <| foldSum oakTree
+        , display "flatten" oakTree Nothing <| flatten oakTree
+        , display "foldFlatten" oakTree Nothing <| foldFlatten oakTree
+        , display "isElement" oakTree (Just 99) <| isElement 99 oakTree
+        , display "isElement" oakTree (Just 4) <| isElement 4 oakTree
+        , display "foldIsElement" oakTree (Just 99) <| foldIsElement 99 oakTree
+        , display "foldIsElement" oakTree (Just 4) <| foldIsElement 4 oakTree
         ]
 
 
-display : String -> a -> Html msg
-display name value =
-    div [] [ text (name ++ " ==> " ++ toString value) ]
+display : String -> Tree a -> Maybe a -> b -> Html msg
+display name tree element value =
+    div []
+        [ h2 [ style styles.h2 ] [ text name ]
+        , div [ style styles.section ]
+            [ h3 [] [ text "Arguments:" ]
+            , p [] [ text <| "TREE ==> " ++ toString tree ]
+            , displayElement element
+            ]
+        , div [ style styles.section ]
+            [ h3 [] [ text "Result:" ]
+            , text <| toString value
+            ]
+        ]
+
+
+displayElement element =
+    let
+        stringified =
+            Maybe.map toString element
+    in
+    case stringified of
+        Just str ->
+            p [] [ text <| "ELEMENT ==> " ++ str ]
+
+        Nothing ->
+            text ""
+
+
+styles =
+    { h2 = [ ( "margin-top", "30px" ), ( "text-decoration", "underline" ) ]
+    , section = [ ( "margin-left", "15px" ) ]
+    }
 
 
 
